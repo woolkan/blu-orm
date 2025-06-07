@@ -1,5 +1,5 @@
 {
-    "name": "vendor/blu-db",
+    "name": "blu/simple-orm",
     "description": "Lightweight Data Mapper ORM",
     "type": "library",
     "license": "MIT",
