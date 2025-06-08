@@ -11,7 +11,8 @@
     "require": {
         "php": ">=8.4",
         "ext-pdo": "*",
-        "ext-redis": "*"
+        "ext-redis": "*",
+        "predis/predis": "^3.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true
