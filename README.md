@@ -5,12 +5,7 @@ Lekka implementacja ORM w architekturze Data Mapper.
 ```php
 require 'vendor/autoload.php';
 
-use Blu\DB\Storage\Connection;
-use Blu\DB\Cache\RedisCache;
-use Blu\DB\Cache\PredisCache;
-use Predis\Client as PredisClient;
-use Blu\DB\Mapper\UserMapper;
-use Blu\DB\Model\User;
+use Blu\DB\Cache\RedisCache;use Blu\DB\Mapper\UserMapper;use Blu\DB\Model\User;use Blu\DB\Storage\Connection;use Predis\Client as PredisClient;
 
 Connection::configure('mysql:host=localhost;dbname=app', 'root', '');
 
