@@ -15,6 +15,9 @@ class QueryBuilder
     private array $joins = [];
     private array $bindings = [];
 
+    private ?string $lastSql      = null;   // 👈 NEW
+    private array   $lastBindings = [];     // 👈 NEW
+
     public function table(string $table): self
     {
         $this->table = $table;
@@ -108,6 +111,33 @@ class QueryBuilder
         return true;
     }
 
+    /** Zwraca zapytanie z podstawionymi wartościami – tylko do debugowania */
+    public function toDebugSql(): string
+    {
+        if ($this->lastSql === null) {
+            return '-- query has not been executed yet --';
+        }
+        return self::interpolate($this->lastSql, $this->lastBindings);
+    }
+
+    /** Podstaw wartości za named-placeholders, używając PDO::quote */
+    private static function interpolate(string $sql, array $bindings): string
+    {
+        $pdo = Connection::get();
+
+        foreach ($bindings as $param => $value) {
+            $replacement = match (true) {
+                $value === null         => 'NULL',
+                is_bool($value)         => $value ? '1' : '0',
+                is_numeric($value)      => (string) $value,
+                default                 => $pdo->quote((string) $value),
+            };
+            /*  \b gwarantuje, że podmieniamy dokładnie ten placeholder */
+            $sql = preg_replace('/' . preg_quote($param, '/') . '\b/', $replacement, $sql);
+        }
+        return $sql;
+    }
+
     private function compileSelect(): string
     {
         $sql = sprintf(
@@ -136,6 +166,9 @@ class QueryBuilder
 
     private function execute(string $sql, array $bindings): \PDOStatement
     {
+        $this->lastSql      = $sql;
+        $this->lastBindings = $bindings;
+
         $pdo = Connection::get();
         $stmt = $pdo->prepare($sql);
         foreach ($bindings as $param => $value) {
