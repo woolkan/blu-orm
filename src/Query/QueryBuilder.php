@@ -114,10 +114,14 @@ class QueryBuilder
     /** Zwraca zapytanie z podstawionymi wartościami – tylko do debugowania */
     public function toDebugSql(): string
     {
-        if ($this->lastSql === null) {
-            return '-- query has not been executed yet --';
+        // jeśli zapytanie już się wykonało – zwracamy gotowe
+        if ($this->lastSql !== null) {
+            return self::interpolate($this->lastSql, $this->lastBindings);
         }
-        return self::interpolate($this->lastSql, $this->lastBindings);
+
+        // jeśli jeszcze NIE, spróbujmy sami złożyć SELECT
+        $sql = $this->compileSelect();        // ta metoda masz już w klasie
+        return self::interpolate($sql, $this->bindings);
     }
 
     /** Podstaw wartości za named-placeholders, używając PDO::quote */
